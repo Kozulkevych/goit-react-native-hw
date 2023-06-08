@@ -13,10 +13,16 @@ import {
 } from "react-native";
 import BgImage from "../../assets/images/photo-bg.jpg";
 
+const initialState = {
+  email: "",
+  password: "",
+};
+
 export default function RegistrationScreen() {
   const [passwordShow, setPasswordShow] = useState(true);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
+  const [state, setState] = useState(initialState);
 
   const keyboardHide = () => {
     setIsShowKeyboard(false);
@@ -35,20 +41,25 @@ export default function RegistrationScreen() {
 
   const isInputFocused = (inputName) => focusedInput === inputName;
 
+  const onLogin = () => {
+    setState(initialState);
+    console.log(state);
+  };
+
   return (
     <TouchableWithoutFeedback onPress={keyboardHide}>
       <View style={styles.container}>
         <ImageBackground style={styles.image} source={BgImage}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-          >
-            <View style={styles.box}>
-              <Text style={styles.title}>Увійти</Text>
-              <View
-                style={{
-                  ...styles.form,
-                  marginBottom: isShowKeyboard ? -100 : "auto",
-                }}
+          <View style={styles.box}>
+            <Text style={styles.title}>Увійти</Text>
+            <View
+              style={{
+                ...styles.form,
+                marginBottom: isShowKeyboard ? -250 : "auto",
+              }}
+            >
+              <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
               >
                 <View style={{ marginBottom: 16 }}>
                   <TextInput
@@ -56,6 +67,10 @@ export default function RegistrationScreen() {
                       styles.input,
                       isInputFocused("email") && styles.inputFocus,
                     ]}
+                    value={state.email}
+                    onChangeText={(value) =>
+                      setState((prevState) => ({ ...prevState, email: value }))
+                    }
                     placeholder="Адреса електронної пошти"
                     placeholderTextColor="#BDBDBD"
                     onFocus={() => handleInputFocus("email")}
@@ -68,6 +83,13 @@ export default function RegistrationScreen() {
                       styles.input,
                       isInputFocused("password") && styles.inputFocus,
                     ]}
+                    value={state.password}
+                    onChangeText={(value) =>
+                      setState((prevState) => ({
+                        ...prevState,
+                        password: value,
+                      }))
+                    }
                     placeholder="Пароль"
                     placeholderTextColor="#BDBDBD"
                     secureTextEntry={passwordShow}
@@ -85,13 +107,17 @@ export default function RegistrationScreen() {
                     )}
                   </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.btn} activeOpacity={0.8}>
-                  <Text style={styles.btnTitle}>Увійти</Text>
-                </TouchableOpacity>
-                <Text style={styles.text}>Немає акаунту? Зареєструватися</Text>
-              </View>
+              </KeyboardAvoidingView>
+              <TouchableOpacity
+                style={styles.btn}
+                activeOpacity={0.8}
+                onPress={onLogin}
+              >
+                <Text style={styles.btnTitle}>Увійти</Text>
+              </TouchableOpacity>
+              <Text style={styles.text}>Немає акаунту? Зареєструватися</Text>
             </View>
-          </KeyboardAvoidingView>
+          </View>
         </ImageBackground>
       </View>
     </TouchableWithoutFeedback>
@@ -115,7 +141,7 @@ const styles = StyleSheet.create({
     marginTop: "auto",
     backgroundColor: "#FFFFFF",
     paddingTop: 32,
-    paddingBottom: "auto",
+    paddingBottom: 144,
   },
   avatar: {
     position: "absolute",

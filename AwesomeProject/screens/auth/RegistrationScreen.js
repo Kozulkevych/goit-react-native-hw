@@ -16,10 +16,17 @@ import {
 import BgImage from "../../assets/images/photo-bg.jpg";
 // import AvatarImage from "../../assets/images/user-avatar.jpg";
 
+const initialState = {
+  login: "",
+  email: "",
+  password: "",
+};
+
 export default function RegistrationScreen() {
   const [passwordShow, setPasswordShow] = useState(true);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
+  const [state, setState] = useState(initialState);
 
   const keyboardHide = () => {
     setIsShowKeyboard(false);
@@ -38,32 +45,34 @@ export default function RegistrationScreen() {
 
   const isInputFocused = (inputName) => focusedInput === inputName;
 
+  const onRegistration = () => {
+    setState(initialState);
+    console.log(state);
+  };
+
   return (
     <TouchableWithoutFeedback onPress={keyboardHide}>
       <View style={styles.container}>
         <ImageBackground style={styles.image} source={BgImage}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-          >
-            <View style={styles.box}>
-              <View style={styles.avatar}>
-                <Image
-                  // source={AvatarImage}
-                  style={styles.avatarImage}
-                />
-                <TouchableOpacity
-                  style={styles.btnAddAvatar}
-                  activeOpacity={0.9}
-                >
-                  <Ionicons name="add" size={20} color="#FF6C00" />
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.title}>Реєстрація</Text>
-              <View
-                style={{
-                  ...styles.form,
-                  marginBottom: isShowKeyboard ? -100 : "auto",
-                }}
+          <View style={styles.box}>
+            <View style={styles.avatar}>
+              <Image
+                // source={AvatarImage}
+                style={styles.avatarImage}
+              />
+              <TouchableOpacity style={styles.btnAddAvatar} activeOpacity={0.9}>
+                <Ionicons name="add" size={20} color="#FF6C00" />
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.title}>Реєстрація</Text>
+            <View
+              style={{
+                ...styles.form,
+                marginBottom: isShowKeyboard ? -170 : "auto",
+              }}
+            >
+              <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
               >
                 <View style={{ marginBottom: 16 }}>
                   <TextInput
@@ -71,6 +80,10 @@ export default function RegistrationScreen() {
                       styles.input,
                       isInputFocused("login") && styles.inputFocus,
                     ]}
+                    value={state.login}
+                    onChangeText={(value) =>
+                      setState((prevState) => ({ ...prevState, login: value }))
+                    }
                     placeholder="Логін"
                     placeholderTextColor="#BDBDBD"
                     onFocus={() => handleInputFocus("login")}
@@ -83,6 +96,10 @@ export default function RegistrationScreen() {
                       styles.input,
                       isInputFocused("email") && styles.inputFocus,
                     ]}
+                    value={state.email}
+                    onChangeText={(value) =>
+                      setState((prevState) => ({ ...prevState, email: value }))
+                    }
                     placeholder="Адреса електронної пошти"
                     placeholderTextColor="#BDBDBD"
                     onFocus={() => handleInputFocus("email")}
@@ -95,6 +112,13 @@ export default function RegistrationScreen() {
                       styles.input,
                       isInputFocused("password") && styles.inputFocus,
                     ]}
+                    value={state.password}
+                    onChangeText={(value) =>
+                      setState((prevState) => ({
+                        ...prevState,
+                        password: value,
+                      }))
+                    }
                     placeholder="Пароль"
                     placeholderTextColor="#BDBDBD"
                     secureTextEntry={passwordShow}
@@ -112,13 +136,17 @@ export default function RegistrationScreen() {
                     )}
                   </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.btn} activeOpacity={0.8}>
-                  <Text style={styles.btnTitle}>Зареєстуватися</Text>
-                </TouchableOpacity>
-                <Text style={styles.text}>Вже є акаунт? Увійти</Text>
-              </View>
+              </KeyboardAvoidingView>
+              <TouchableOpacity
+                style={styles.btn}
+                activeOpacity={0.8}
+                onPress={onRegistration}
+              >
+                <Text style={styles.btnTitle}>Зареєстуватися</Text>
+              </TouchableOpacity>
+              <Text style={styles.text}>Вже є акаунт? Увійти</Text>
             </View>
-          </KeyboardAvoidingView>
+          </View>
         </ImageBackground>
       </View>
     </TouchableWithoutFeedback>
