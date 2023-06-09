@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import {
   StyleSheet,
@@ -13,20 +14,38 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import BgImage from "../../assets/images/photo-bg.jpg";
 // import AvatarImage from "../../assets/images/user-avatar.jpg";
-
-const initialState = {
-  login: "",
-  email: "",
-  password: "",
-};
 
 export default function RegistrationScreen() {
   const [passwordShow, setPasswordShow] = useState(true);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
-  const [state, setState] = useState(initialState);
+  const [image, setImage] = useState(null);
+  const [login, setLogin] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const navigation = useNavigation();
+
+  const imageHandler = async (setImage) => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert("Вибачте, нам потрібен доступ до вашої галереї для цього!");
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
 
   const keyboardHide = () => {
     setIsShowKeyboard(false);
@@ -46,8 +65,11 @@ export default function RegistrationScreen() {
   const isInputFocused = (inputName) => focusedInput === inputName;
 
   const onRegistration = () => {
-    setState(initialState);
-    console.log(state);
+    console.log(login, email, password);
+    setLogin("");
+    setEmail("");
+    setPassword("");
+    navigation.navigate("Home");
   };
 
   return (
@@ -56,11 +78,14 @@ export default function RegistrationScreen() {
         <ImageBackground style={styles.image} source={BgImage}>
           <View style={styles.box}>
             <View style={styles.avatar}>
-              <Image
-                // source={AvatarImage}
-                style={styles.avatarImage}
-              />
-              <TouchableOpacity style={styles.btnAddAvatar} activeOpacity={0.9}>
+              {image ? (
+                <Image style={styles.avatarImage} source={{ uri: image }} />
+              ) : null}
+              <TouchableOpacity
+                style={styles.btnAddAvatar}
+                activeOpacity={0.9}
+                onPress={() => imageHandler(setImage)}
+              >
                 <Ionicons name="add" size={20} color="#FF6C00" />
               </TouchableOpacity>
             </View>
@@ -68,7 +93,7 @@ export default function RegistrationScreen() {
             <View
               style={{
                 ...styles.form,
-                marginBottom: isShowKeyboard ? -170 : "auto",
+                marginBottom: isShowKeyboard ? 50 : "auto",
               }}
             >
               <KeyboardAvoidingView
@@ -80,10 +105,8 @@ export default function RegistrationScreen() {
                       styles.input,
                       isInputFocused("login") && styles.inputFocus,
                     ]}
-                    value={state.login}
-                    onChangeText={(value) =>
-                      setState((prevState) => ({ ...prevState, login: value }))
-                    }
+                    value={login}
+                    onChangeText={(value) => setLogin(value)}
                     placeholder="Логін"
                     placeholderTextColor="#BDBDBD"
                     onFocus={() => handleInputFocus("login")}
@@ -96,10 +119,8 @@ export default function RegistrationScreen() {
                       styles.input,
                       isInputFocused("email") && styles.inputFocus,
                     ]}
-                    value={state.email}
-                    onChangeText={(value) =>
-                      setState((prevState) => ({ ...prevState, email: value }))
-                    }
+                    value={email}
+                    onChangeText={(value) => setEmail(value)}
                     placeholder="Адреса електронної пошти"
                     placeholderTextColor="#BDBDBD"
                     onFocus={() => handleInputFocus("email")}
@@ -112,13 +133,8 @@ export default function RegistrationScreen() {
                       styles.input,
                       isInputFocused("password") && styles.inputFocus,
                     ]}
-                    value={state.password}
-                    onChangeText={(value) =>
-                      setState((prevState) => ({
-                        ...prevState,
-                        password: value,
-                      }))
-                    }
+                    value={password}
+                    onChangeText={(value) => setPassword(value)}
                     placeholder="Пароль"
                     placeholderTextColor="#BDBDBD"
                     secureTextEntry={passwordShow}
@@ -144,7 +160,13 @@ export default function RegistrationScreen() {
               >
                 <Text style={styles.btnTitle}>Зареєстуватися</Text>
               </TouchableOpacity>
-              <Text style={styles.text}>Вже є акаунт? Увійти</Text>
+              <View style={styles.row}>
+                <Text style={styles.text}>Вже є акаунт?</Text>
+                <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+                  <Text style={[styles.text, styles.link]}> Увійти</Text>
+                </TouchableOpacity>
+              </View>
+              {/* <Text style={styles.text}>Вже є акаунт? Увійти</Text> */}
             </View>
           </View>
         </ImageBackground>
@@ -265,6 +287,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19,
     textAlign: "center",
+    color: "#1B4371",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  link: {
     color: "#1B4371",
   },
 });

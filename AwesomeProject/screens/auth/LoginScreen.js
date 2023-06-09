@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import {
   StyleSheet,
   TextInput,
@@ -13,16 +14,14 @@ import {
 } from "react-native";
 import BgImage from "../../assets/images/photo-bg.jpg";
 
-const initialState = {
-  email: "",
-  password: "",
-};
-
 export default function RegistrationScreen() {
   const [passwordShow, setPasswordShow] = useState(true);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
-  const [state, setState] = useState(initialState);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const navigation = useNavigation();
 
   const keyboardHide = () => {
     setIsShowKeyboard(false);
@@ -42,8 +41,10 @@ export default function RegistrationScreen() {
   const isInputFocused = (inputName) => focusedInput === inputName;
 
   const onLogin = () => {
-    setState(initialState);
-    console.log(state);
+    console.log(email, password);
+    setEmail("");
+    setPassword("");
+    navigation.navigate("Home");
   };
 
   return (
@@ -55,7 +56,7 @@ export default function RegistrationScreen() {
             <View
               style={{
                 ...styles.form,
-                marginBottom: isShowKeyboard ? -250 : "auto",
+                marginBottom: isShowKeyboard ? 20 : "auto",
               }}
             >
               <KeyboardAvoidingView
@@ -67,10 +68,8 @@ export default function RegistrationScreen() {
                       styles.input,
                       isInputFocused("email") && styles.inputFocus,
                     ]}
-                    value={state.email}
-                    onChangeText={(value) =>
-                      setState((prevState) => ({ ...prevState, email: value }))
-                    }
+                    value={email}
+                    onChangeText={(value) => setEmail(value)}
                     placeholder="Адреса електронної пошти"
                     placeholderTextColor="#BDBDBD"
                     onFocus={() => handleInputFocus("email")}
@@ -83,13 +82,8 @@ export default function RegistrationScreen() {
                       styles.input,
                       isInputFocused("password") && styles.inputFocus,
                     ]}
-                    value={state.password}
-                    onChangeText={(value) =>
-                      setState((prevState) => ({
-                        ...prevState,
-                        password: value,
-                      }))
-                    }
+                    value={password}
+                    onChangeText={(value) => setPassword(value)}
                     placeholder="Пароль"
                     placeholderTextColor="#BDBDBD"
                     secureTextEntry={passwordShow}
@@ -115,7 +109,17 @@ export default function RegistrationScreen() {
               >
                 <Text style={styles.btnTitle}>Увійти</Text>
               </TouchableOpacity>
-              <Text style={styles.text}>Немає акаунту? Зареєструватися</Text>
+              <View style={styles.row}>
+                <Text style={styles.text}>Немає акаунту?</Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("Registration")}
+                >
+                  <Text style={[styles.text, styles.link]}>
+                    {" "}
+                    Зареєструватися
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </ImageBackground>
@@ -236,6 +240,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19,
     textAlign: "center",
+    color: "#1B4371",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  link: {
     color: "#1B4371",
   },
 });
